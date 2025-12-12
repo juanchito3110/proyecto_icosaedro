@@ -44,7 +44,6 @@ class Icosaedro:
         """ Determina qué vértices están conectados basándose en la distancia """
         numeroVertices = len(coordenas)
         aristas = []
-        # ... (Cálculo de distancia mínima para encontrar vecinos) ...
         # Se omite detalle matemático repetitivo, se mantiene lógica de conexión
         distancia_minima = float(100)
         # Busca la distancia más corta entre puntos (la longitud de la arista)

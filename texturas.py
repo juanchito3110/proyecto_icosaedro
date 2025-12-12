@@ -25,7 +25,7 @@ class GestorTexturas:
                 # Dibuja líneas diagonales decorativas
                 for i in range(0, w, 10):
                     pygame.draw.line(surf, (255,255,255,40), (i,0), (0,i), 2)
-                # Dibuja puntos aleatorios ("nieve")
+
                 for _ in range(80):
                     px = random.randint(0, w-1)
                     py = random.randint(0, h-1)
