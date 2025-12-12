@@ -11,7 +11,6 @@ class DDA:
         dy = (y2 - y1)
         dx = (x2 - x1)
 
-        # 2. Determinar pasos: ¿Hay más distancia en X o en Y?
         # Esto define si recorremos pixel por pixel en horizontal o vertical
         if abs(dx) > abs(dy):
             pasos = abs(dx)

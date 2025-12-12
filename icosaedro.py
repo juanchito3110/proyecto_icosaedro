@@ -136,11 +136,7 @@ class Icosaedro:
             # Aplicar textura con máscaras de Pygame
             try:
                 textura = self.gestor_texturas.get_textura_para_indice(idx)
-                # ... (Lógica de recorte y escalado de textura, se mantiene igual) ...
-                # Se crea una superficie temporal, se dibuja el triángulo y se pega la textura
-                # Esto simula el mapeo UV de forma básica
 
-                # ... (Código de texturas omitido por brevedad, es visual) ...
             except Exception:
                 pass  # Si falla la textura, queda el color sólido
 
