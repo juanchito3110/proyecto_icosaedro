@@ -3,9 +3,7 @@ import math
 from texturas import GestorTexturas
 from sombreado import sombreado_plano
 from triangulo import Triangulo
-
 from rectaDDA import DDA
-
 
 class Icosaedro:
     def __init__(self, ventana):
@@ -48,6 +46,7 @@ class Icosaedro:
     def proyectar_icosaedro(self, vertices, vectorP, inicioX, inicioY, escala):
         xp, yp, zp = vectorP
         proyeccion = []
+        #por cada vertice, calcular x & y, después se escala y se agrega a la lista de proyeccion
         for vertice in vertices:
             x1, y1, z1 = vertice
             x = inicioX + (x1 - yp * (z1 / zp)) * escala
@@ -60,22 +59,26 @@ class Icosaedro:
 
         numeroVertices = len(coordenas)
         aristas = []
-        distancia_minima = float(100)
-        tolerancia = 1e-6
+        distancia_minima = float(100)#primero se define una distancia mínima muy grande
+        tolerancia = 1e-6 #tolerancia pequeña
+        #for para encontrar la distancia mínima entre los vértices
         for i in range(numeroVertices):
             for j in range(i + 1, numeroVertices):
                 x1, y1, z1 = coordenas[i]
                 x2, y2, z2 = coordenas[j]
-                distancia = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
+                distancia = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)#fórmula pra calcular la distancia
+                #si la distancia actual es mayor que la tolerancia, se actualiza
                 if 1e-6 < distancia < distancia_minima:
                     distancia_minima = distancia
-
+        #se define la distancia mínima con la se compará a todos los vértices para saber si forman aristas
         largo_arista = distancia_minima
+        #se itera sobre todos los vértices, ahora para saber si sí forman una arista
         for i in range(numeroVertices):
             for j in range(i + 1, numeroVertices):
                 x1, y1, z1 = coordenas[i]
                 x2, y2, z2 = coordenas[j]
                 distancia = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
+                #si la distancia es igual al largo de lo que debe ser la arista, se guarda el índice del vértice
                 if abs(distancia - largo_arista) < tolerancia:
                     aristas.append((i, j))
         # print(len(aristas))
@@ -95,19 +98,22 @@ class Icosaedro:
 
     def obtener_caras(self, aristas):
 
+        #convertir en fronzensets
         juego_aristas = set()
         for i, j in aristas:
             juego_aristas.add(frozenset((i, j)))
 
         caras = []
         num_vertices = 12
-
+        #iterar sobre los posibles tríos de vértices
         for i in range(num_vertices):
             for j in range(i + 1, num_vertices):
-                if frozenset((i, j)) not in juego_aristas:
+                if frozenset((i, j)) not in juego_aristas: # si no son una arista, se pasa al siguiente
                     continue
                 for k in range(j + 1, num_vertices):
+                    #Si (i, k) y (j, k) también son aristas, entonces (i, j, k) es una cara triangular
                     if frozenset((i, k)) in juego_aristas and frozenset((j, k)) in juego_aristas:
+                        #agregarlo como cara
                         caras.append((i, j, k))
 
         return caras
@@ -115,34 +121,35 @@ class Icosaedro:
     def rellenar_triangulo_scanline(self, p1, p2, p3, color):
 
         vertices = [p1, p2, p3]
-
+        #encontrar rango vertical
         y_min = int(min(v[1] for v in vertices))
         y_max = int(max(v[1] for v in vertices))
-
+        #iterar sobre cada línea de barrido vertical
         for y in range(y_min, y_max + 1):
             intersecciones = []
-            for i in range(len(vertices)):
+            for i in range(len(vertices)):#itera sobre las aristas del triángulo
                 v1 = vertices[i]
                 v2 = vertices[(i + 1) % len(vertices)]
                 x1, y1 = v1
                 x2, y2 = v2
-                if y1 == y2:
+                if y1 == y2: #omitir horizontales
                     continue
 
-                if (y >= min(y1, y2)) and (y < max(y1, y2)):
+                if (y >= min(y1, y2)) and (y < max(y1, y2)):#si la linea y cruza con la arista
                     try:
-                        x_int = x1 + (y - y1) * (x2 - x1) / (y2 - y1)
+                        x_int = x1 + (y - y1) * (x2 - x1) / (y2 - y1)#calcular coordenada x 
                         intersecciones.append(x_int)
                     except ZeroDivisionError:
                         continue
 
-            intersecciones.sort()
+            intersecciones.sort()#ordenar intersecciones por el valor de x
 
-            if len(intersecciones) >= 2:
+            if len(intersecciones) >= 2:#si hay más de dos intersecciones sí hay línea de barrido
+                #tomar el primer y segundo punto se la intersección
                 x_inicio = int(intersecciones[0])
                 x_fin = int(intersecciones[1])
 
-                if x_inicio < x_fin:
+                if x_inicio < x_fin:#dibujar las lineas rectas
                     self.linea.dibujar_recta_DDA2(x_inicio, y, x_fin, y, color)
 
     def rellenar_icosaedro(self, vertices_3d, proyeccion_2d, caras, color_relleno, color_borde):
